@@ -1,0 +1,12 @@
+30DayMap2024/data/
+30DayMap2024/data
+30DayMap2024/.venv/
+**/30DayMap2024/.venv
+**/data 
+*.parquet
+*.geojson
+*.shp
+*.csv 
+
+
+
