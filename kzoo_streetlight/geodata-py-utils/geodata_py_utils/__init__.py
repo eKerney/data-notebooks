@@ -1,4 +1,5 @@
 import geopandas as gpd
+from geopandas import GeoDataFrame
 import json
 import logging
 from enum import Enum
@@ -18,7 +19,7 @@ class GeoData:
     Parameters
     ----------
     file_path : str = ""
-        Path to the local file, URL to GeoJSON, or in memoery GeoJSON string.
+        Path to the local file, URL to GeoJSON, or in memory GeoJSON string.
     input_type : InputTypes = InputTypes.DATA_PATH
         Path InputType string Enum:
         `InputTypes.DATA_PATH`: GeoPandas ``read_file`` method reading
@@ -74,7 +75,16 @@ class GeoData:
             self.gdf = gpd.read_file(json.load(file_path))
 
     @property
-    def gdf(self) -> gpd.GeoDataFrame:
+    def gdf(self) -> GeoDataFrame:
+        """
+        Access the gdf property containing the data via a GeoPandas `GeoDataframe`
+        Access builtin `GeoDataframe` methods directly as needed
+
+        Examples
+        --------
+        >>> geo_data.gdf.tail()
+
+        """
         return self._gdf
 
     @gdf.setter
@@ -82,7 +92,12 @@ class GeoData:
         self._gdf = value
 
     @property
-    def geojson(self) -> json:
+    def geojson(self) -> dict:
+        """
+        Return data as GeoJSON dict using ``GeoDataframe.to_json``
+        Dataframe is converted into GeoJSON dict each time method is called.
+        Could be time consuming for larger datasets.
+        """
         return json.loads(self.gdf.to_json())
 
     @geojson.setter
@@ -90,6 +105,13 @@ class GeoData:
         self._geojson = value
 
     def export_geojson(self, file_name="geojson_file.geojson") -> None:
+        """
+        Writes GeoData out as a local GeoJSON file with python file builtin
+        Parameters
+        ----------
+        file_name : str 
+            Name of file to export, .geojson added during export.
+        """
         with open((f'{file_name}.geojson'), "w") as outfile:
             outfile.write(json.dumps(self.geojson))
         print(f'GeoJSON output: {file_name}.geojson')
