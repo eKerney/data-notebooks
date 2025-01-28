@@ -18,7 +18,7 @@ class GeoData:
     Parameters
     ----------
     file_path : str = ""
-        Path to the local file or URL to GeoJSON
+        Path to the local file, URL to GeoJSON, or in memoery GeoJSON string.
     input_type : InputTypes = InputTypes.DATA_PATH
         Path InputType string Enum:
         `InputTypes.DATA_PATH`: GeoPandas ``read_file`` method reading
@@ -32,8 +32,19 @@ class GeoData:
     row_filter : int = 0
         from Load first `x` rows into GeoDataframe
 
-    Returns
+    Examples
     --------
+    >>> url_path = 'https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/110m/cultural/ne_110m_admin_0_countries.json'
+    >>> geo_data = GeoData(url_path, InputTypes.DATA_URL, row_filter=10)
+    >>> geo_data.gdf
+    scalerank       featurecla  LABELRANK   SOVEREIGNT SOV_A3  ADM0_DIF  LEVEL  \
+    0          1  Admin-0 country        3.0  Afghanistan    AFG       0.0    2.0   
+    1          1  Admin-0 country        3.0       Angola    AGO       0.0    2.0   
+    ...
+                                                geometry  
+    0  POLYGON ((61.21082 35.65007, 62.23065 35.27066...  
+    1  MULTIPOLYGON (((23.90415 -11.72228, 24.07991 -...  
+    [2 rows x 72 columns]
     """
 
     def __init__(
@@ -42,6 +53,11 @@ class GeoData:
             input_type: InputTypes = InputTypes.DATA_PATH,
             row_filter: int = 0
             ):
+        """
+        Generates new GeoData object, see parameters above.
+        Loads data into GeoPandas dataframe as `self.gdf` attribute
+        """
+
         if not file_path:
             self.gdf = None
             logging.warning('NO PATH SPECIFIED')
