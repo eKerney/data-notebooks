@@ -1,8 +1,13 @@
+from __future__ import annotations
 import geopandas as gpd
 from geopandas import GeoDataFrame
 import json
 import logging
 from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from _typeshed import FileDescriptorOrPath, SupportsRead
 
 
 class InputTypes(Enum):
@@ -50,7 +55,8 @@ class GeoData:
 
     def __init__(
             self,
-            file_path: str = "",
+            file_path: SupportsRead[str | bytes],
+            # file_path: SupportsRead[str | bytes | os.PathLike[str]],
             input_type: InputTypes = InputTypes.DATA_PATH,
             row_filter: int = 0
             ):
