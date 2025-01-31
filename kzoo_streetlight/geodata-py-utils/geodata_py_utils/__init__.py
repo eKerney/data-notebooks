@@ -15,6 +15,7 @@ class InputTypes(Enum):
     DATA_URL = 'DATA_URL'
     DATA_FILE = 'DATA_FILE'
     DATA_STRING = 'DATA_STRING'
+    DATA_FEATURES = 'DATA_FEATURES'
 
 
 class GeoData:
@@ -23,7 +24,7 @@ class GeoData:
 
     Parameters
     ----------
-    file_path : str = ""
+    file_path : SupportsRead [str | bytes],
         Path to the local file, URL to GeoJSON, or in memory GeoJSON string.
     input_type : InputTypes = InputTypes.DATA_PATH
         Path InputType string Enum:
@@ -34,7 +35,9 @@ class GeoData:
         `InputTypes.DATA_FILE`: Use builtin python ``open`` to read file, then
             `json.load` into GeoPandas ``read_file``
         `InputTypes.DATA_STRING`: Load in memory data directly as a string,
-            then `json.load` into GeoPandas ``read_file``
+            then `json.load` into GeoPandas ``GeoDataframe.from_features``
+        `InputTypes.DATA_FEATURES` : Load in memory features from GeoJSON dict
+            into GeoPandas ``GeoDataframe.from_features``
     row_filter : int = 0
         from Load first `x` rows into GeoDataframe
 
@@ -78,7 +81,10 @@ class GeoData:
             self.gdf = gpd.read_file(json.load(f))
         elif input_type == InputTypes.DATA_STRING:
             logging.info(f'Loaded Data: {file_path}')
-            self.gdf = gpd.read_file(json.load(file_path))
+            self.gdf = gpd.GeoDataFrame().from_features(json.loads(file_path))
+        elif input_type == InputTypes.DATA_FEATURES:
+            logging.info(f'Loaded Data: {file_path}')
+            self.gdf = gpd.GeoDataFrame().from_features(file_path)
 
     @property
     def gdf(self) -> GeoDataFrame:
@@ -115,7 +121,7 @@ class GeoData:
         Writes GeoData out as a local GeoJSON file with python file builtin
         Parameters
         ----------
-        file_name : str 
+        file_name : str
             Name of file to export, .geojson added during export.
         """
         with open((f'{file_name}.geojson'), "w") as outfile:
